@@ -5,4 +5,6 @@ cache:
   directories:
   - '$HOME/.m2/repository'
 script:
-  - mvn clean package
+  - mvn clean test
+  - mvn jacoco:report
+  - mvn coveralls:report -DrepoToken="${COVERALLS_TOKEN}"
