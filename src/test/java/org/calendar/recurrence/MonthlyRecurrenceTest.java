@@ -446,4 +446,44 @@ class MonthlyRecurrenceTest {
 				() -> assertEquals(LocalDate.of(1999, 3, 10), iter.next()),
 				() -> assertEquals(LocalDate.of(1999, 3, 11), iter.next()));
 	}
+	
+	@Test
+	@DisplayName("the first work day of the month")
+	void test_the_first_work_day_of_the_month() {
+		RecurrenceRule rule = RecurrenceRule.getInstance("RRULE:FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1;COUNT=5");
+		LocalDate start = LocalDate.of(2018, 1, 1);//2018-01-01 is Monday
+		RecurrenceCalendar recurrence = RecurrenceCalendar.getInstance(start, rule);
+		List<LocalDate> recurDates = new ArrayList<>();
+		while (recurrence.hasNext()) {
+			LocalDate date = recurrence.next();
+			recurDates.add(date);
+		}
+		Iterator<LocalDate> iter = recurDates.iterator();
+		assertAll(() -> assertEquals(5, recurDates.size()),
+				() -> assertEquals(LocalDate.of(2018, 1, 1), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 2, 1), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 3, 1), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 4, 2), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 5, 1), iter.next()));
+	}
+
+	@Test
+	@DisplayName("the last work day of the month")
+	void test_the_last_work_day_of_the_month() {
+		RecurrenceRule rule = RecurrenceRule.getInstance("RRULE:FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=5");
+		LocalDate start = LocalDate.of(2018, 1, 1);//2018-01-01 is Monday
+		RecurrenceCalendar recurrence = RecurrenceCalendar.getInstance(start, rule);
+		List<LocalDate> recurDates = new ArrayList<>();
+		while (recurrence.hasNext()) {
+			LocalDate date = recurrence.next();
+			recurDates.add(date);
+		}
+		Iterator<LocalDate> iter = recurDates.iterator();
+		assertAll(() -> assertEquals(5, recurDates.size()),
+				() -> assertEquals(LocalDate.of(2018, 1, 31), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 2, 28), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 3, 30), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 4, 30), iter.next()),
+				() -> assertEquals(LocalDate.of(2018, 5, 31), iter.next()));
+	}
 }

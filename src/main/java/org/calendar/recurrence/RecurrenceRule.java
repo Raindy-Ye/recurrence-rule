@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -49,6 +50,7 @@ public class RecurrenceRule {
 	private int count;
 	private int interval = 1;// default should be one
 	private Date until;
+	private TreeSet<Integer> setPos;
 
 	private static final Pattern RRULE_PARTS = Pattern.compile("^RRULE:(?:FREQ|UNTIL|COUNT|INTERVAL|BYDAY|BYMONTHDAY|"
 			+ "BYWEEKDAY|BYWEEKNO|BYMONTH|BYSETPOS|WKST|X-[A-Z0-9\\-]+)\\s*=.+", Pattern.CASE_INSENSITIVE);
@@ -106,6 +108,10 @@ public class RecurrenceRule {
 			case "BYMONTHDAY":
 				rrule.dayOfMonthValidator = DayOfMonthValidator.createInstance(paraValue);
 				break;
+			case "BYSETPOS":
+				rrule.setPos = new TreeSet<>();
+				Stream.of(paraValue.split(",")).forEach(p -> rrule.setPos.add(Integer.parseInt(p)));
+				break;
 			default:
 				break;
 			}
@@ -147,6 +153,10 @@ public class RecurrenceRule {
 
 	public void setInterval(int interval) {
 		this.interval = interval;
+	}
+
+	public TreeSet<Integer> getSetPos() {
+		return setPos;
 	}
 
 	public DayOfWeekValidator getDayOfWeekValidator() {

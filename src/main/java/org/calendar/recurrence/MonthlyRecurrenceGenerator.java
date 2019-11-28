@@ -17,6 +17,9 @@ package org.calendar.recurrence;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 
 class MonthlyRecurrenceGenerator implements RecurrenceGenerator {
 	private int interval;
@@ -24,22 +27,45 @@ class MonthlyRecurrenceGenerator implements RecurrenceGenerator {
 	private DayOfWeekValidator weekDayValidator;
 	private DayOfMonthValidator dayOfMonthValidator;
 	private MonthValidator monthValidator;
-
+	private LocalDate[] validDatesInMonth = new LocalDate[32];
+	private TreeSet<Integer> setPos;
+	
 	MonthlyRecurrenceGenerator(LocalDate startDate, RecurrenceRule rule) {
 		this.dateCursor = startDate;
 		this.interval = rule.getInterval();
 		this.weekDayValidator = rule.getDayOfWeekValidator();
 		this.monthValidator = rule.getMonthValidator();
 		this.dayOfMonthValidator = rule.getDayOfMonthValidator();
+		this.setPos = new TreeSet<Integer>((a, b) -> Math.abs(a) - Math.abs(b));
+		if (rule.getSetPos() != null) {
+			this.setPos.addAll(rule.getSetPos());
+		}
 	}
 
 	public LocalDate next() {
-		while (!isValid()) {
+		if (setPos.isEmpty()) {
+			while (!isValid()) {
+				moveCursor();
+			}
+			LocalDate generatedDate = dateCursor;
 			moveCursor();
+			return generatedDate;
+		} else {
+			LocalDate startDate = dateCursor;
+			dateCursor = dateCursor.with(TemporalAdjusters.firstDayOfMonth());
+			int currentMonth = dateCursor.getMonthValue();
+			int pos = 1;
+			while (currentMonth == dateCursor.getMonthValue()) {
+				while (!isValid()) {
+					moveCursor();
+				}
+				if (!startDate.isAfter(dateCursor)) {
+					validDatesInMonth[pos++] = dateCursor;
+				}
+				moveCursor();
+			}
+			return null;
 		}
-		LocalDate generatedDate = dateCursor;
-		moveCursor();
-		return generatedDate;
 	}
 
 	private void moveCursor() {

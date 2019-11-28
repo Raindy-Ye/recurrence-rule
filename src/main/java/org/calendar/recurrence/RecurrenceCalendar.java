@@ -71,8 +71,7 @@ public class RecurrenceCalendar {
 			instance.generator =new WeeklyRecurrenceGenerator(rule);
 			break;
 		default:
-			MonthlyRecurrenceGenerator monthlyGenerator = new MonthlyRecurrenceGenerator(instance.dateCursor, rule);
-			instance.generator = monthlyGenerator;
+			instance.generator = new MonthlyRecurrenceGenerator(instance.dateCursor, rule);
 			break;
 		}
 		instance.generator.setInterval(rule.getInterval());
